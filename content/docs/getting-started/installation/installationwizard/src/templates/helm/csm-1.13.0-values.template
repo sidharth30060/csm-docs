@@ -117,8 +117,8 @@ csi-powermax:
   enabled: $POWERMAX_ENABLED
   global:
     managedArrays: "000000000001,000000000002"
-    portGroups:
-    transportProtocol: ""
+    portGroups: "$POWERMAX_PORT_GROUPS"
+    transportProtocol: "$NODE_TRANSPORT_PROTOCOL"
     storageArrays:
       - storageArrayId: "$POWERMAX_STORAGE_ARRAY_ID"
         endpoint: $POWERMAX_STORAGE_ARRAY_ENDPOINT_URL
@@ -162,12 +162,10 @@ csi-powermax:
     noderescan:
       image: quay.io/dell/container-storage-modules/dell-csi-node-rescanner:v1.4.0
   clusterPrefix: $POWERMAX_CLUSTER_PREFIX
-  portGroups: "$POWERMAX_PORT_GROUPS"
   fsGroupPolicy: "$FSGROUP_POLICY"
   maxPowerMaxVolumesPerNode: $MAX_VOLUMES_PER_NODE
   podmonAPIPort: 8083
   enableCHAP: $ISCSI_CHAP_ENABLED
-  transportProtocol: "$NODE_TRANSPORT_PROTOCOL"
   storageCapacity:
     enabled: $STORAGE_CAPACITY_ENABLED
   controller:
