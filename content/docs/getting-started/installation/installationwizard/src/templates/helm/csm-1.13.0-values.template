@@ -116,7 +116,7 @@ csi-powerstore:
 csi-powermax:
   enabled: $POWERMAX_ENABLED
   global:
-    managedArrays: "000000000001,000000000002"
+    managedArrays: "$POWERMAX_STORAGE_ARRAY_ID"
     portGroups: "$POWERMAX_PORT_GROUPS"
     transportProtocol: "$NODE_TRANSPORT_PROTOCOL"
     storageArrays:
