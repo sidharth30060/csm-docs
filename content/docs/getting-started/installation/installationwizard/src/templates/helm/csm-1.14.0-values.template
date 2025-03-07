@@ -116,6 +116,9 @@ csi-powerstore:
 csi-powermax:
   enabled: $POWERMAX_ENABLED
   global:
+    managedArrays: "$POWERMAX_STORAGE_ARRAY_ID"
+    portGroups: "$POWERMAX_PORT_GROUPS"
+    transportProtocol: "$NODE_TRANSPORT_PROTOCOL"
     storageArrays:
       - storageArrayId: "$POWERMAX_STORAGE_ARRAY_ID"
         endpoint: $POWERMAX_STORAGE_ARRAY_ENDPOINT_URL
@@ -126,10 +129,7 @@ csi-powermax:
       - endpoint: $POWERMAX_MANAGEMENT_SERVERS_ENDPOINT_URL
       - endpoint: $TARGET_UNISPHERE
 
-    portGroups: "$POWERMAX_PORT_GROUPS"
-    transportProtocol: "$NODE_TRANSPORT_PROTOCOL"
     useSecret: $REVPROXY_USE_SECRET
-    managedArrays: "$POWERMAX_STORAGE_ARRAY_ID"
   version: v2.14.0
   images:
     # "driver" defines the container image, used for the driver container.
