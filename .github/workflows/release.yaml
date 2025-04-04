@@ -1,0 +1,77 @@
+name: Create New Release Branch
+
+on:
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  create-release-branch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Needed for pushing changes
+      pull-requests: write  # Needed for creating PRs
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure all branches are fetched
+          token: ${{ secrets.PAT_TOKEN }}  # Use the PAT
+
+      - name: Get Latest Version from hugo.toml
+        id: get-latest-version
+        run: |
+          # Extract the first version value from hugo.toml
+          latest_version=$(grep -m1 'version = "' hugo.toml | sed -E 's/version = "(.*)"/\1/')
+          new_release="release-$latest_version"
+          
+          echo "Latest version from hugo.toml: $latest_version"
+          echo "NEW_RELEASE=$new_release" >> $GITHUB_ENV
+          echo "new_release=$new_release" >> $GITHUB_OUTPUT
+
+
+      - name: Create and Push New Release Branch
+        run: |
+          git checkout -b "$NEW_RELEASE"
+          git push origin "$NEW_RELEASE"
+
+      - name: Update `deploy.yml` in New Release Branch
+        run: |
+          git checkout "$NEW_RELEASE"  # Ensure we're on the correct branch
+          echo "Before update:"
+          cat .github/workflows/deploy.yml
+          
+          # Directly replace the old release branch name with the new one
+          sed -i -E "s/release-[0-9]+\.[0-9]+\.[0-9]+/$NEW_RELEASE/g" .github/workflows/deploy.yml
+          
+          echo "After update:"
+          cat .github/workflows/deploy.yml
+          
+          # Commit and push the changes if any
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add .github/workflows/deploy.yml
+          git commit -m "Update deploy.yml to track $NEW_RELEASE"
+          git push origin "$NEW_RELEASE"
+
+      - name: Create a PR to update `deploy.yml` in Main
+        run: |
+          git checkout main
+          git pull origin main
+          
+          # Create a temporary branch for the PR
+          git checkout -b update-release-main
+          
+          # Update deploy.yml with the new release number
+          sed -i -E "s/release-[0-9]+\.[0-9]+\.[0-9]+/$NEW_RELEASE/g" .github/workflows/deploy.yml
+          
+          git add .github/workflows/deploy.yml
+          git commit -m "Update deploy.yml to track $NEW_RELEASE in main"
+          git push origin update-release-main
+
+          # Create a pull request
+          gh pr create --title "Update deploy.yml for $NEW_RELEASE" \
+                       --body "This PR updates deploy.yml to track the new release: $NEW_RELEASE." \
+                       --base main \
+                       --head update-release-main
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  # Use PAT for authentication

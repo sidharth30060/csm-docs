@@ -1,0 +1,131 @@
+name: Version Update
+
+on:
+  workflow_dispatch:  # Allows manual triggering from the GitHub UI
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the main branch with full history
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0  # Required to create a new branch from the full commit history
+
+      # Step 2: Configure Git user identity for commits
+      - name: Set up Git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Step 3: Create a new timestamped branch for changes
+      - name: Create new branch
+        run: |
+          BRANCH_NAME="version-update-$(date +%Y%m%d%H%M%S)"
+          git checkout -b $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+      # Step 4: Run the full version update logic
+      - name: Run version update script
+        run: |
+          set -e  # Exit on any error
+
+          # Define the content versions in order (oldest to newest)
+          versions=("docs" "v1" "v2" "v3")
+
+          # Loop from second-last to first to copy content forward
+          for ((i=${#versions[@]}-2; i>=0; i--)); do
+              src="content/${versions[i]}"
+              dest="content/${versions[i+1]}"
+
+              # Validate source directory exists
+              if [ ! -d "$src" ]; then
+                  echo "❌ Error: Source directory $src does not exist!"
+                  exit 1
+              fi
+
+              # Clear and recreate destination directory
+              rm -rf "$dest"
+              mkdir -p "$dest"
+
+              # Copy all files and subdirectories from src to dest
+              cp -r "$src/." "$dest/" || echo "⚠️ Warning: No files copied from $src"
+              echo "✅ Copied contents from $src to $dest (Old files removed)"
+
+              # Update content path references inside files (e.g., (docs/ → (v1/)
+              find "$dest" -type f -exec sed -i "s#\\(\\S*\\)(${versions[i]}/#\\1(${versions[i+1]}/#g" {} +
+
+              # Update full path references (e.g., content/docs/ → content/v1/)
+              find "$dest" -type f -exec sed -i "s#\\(\\S*\\)content/${versions[i]}/#\\1content/${versions[i+1]}/#g" {} +
+
+              # Update Hugo shortcode usage (e.g., {{< version-docs → {{< version-v1)
+              find "$dest" -type f -exec sed -i "s/{{< version-${versions[i]}\\b/{{< version-${versions[i+1]}/g" {} +
+
+              echo "✅ Updated directory references inside files from ${versions[i]} to ${versions[i+1]}"
+
+              # Show a summary of changed files
+              git diff --stat "$dest"
+
+              # Copy corresponding shortcode HTML file (e.g., version-docs.html → version-v1.html)
+              shortcode_src="layouts/shortcodes/version-${versions[i]}.html"
+              shortcode_dest="layouts/shortcodes/version-${versions[i+1]}.html"
+
+              if [ -f "$shortcode_src" ]; then
+                  cp "$shortcode_src" "$shortcode_dest"
+                  echo "✅ Copied $shortcode_src → $shortcode_dest"
+              else
+                  echo "⚠️ Shortcode $shortcode_src not found, skipping."
+              fi
+          done
+
+          # Modify _index.md of base version (docs) to insert a page info block
+          index_file="content/docs/_index.md"
+          if [ -f "$index_file" ]; then
+              echo "✅ Found $index_file, modifying..."
+
+              awk '
+              BEGIN {
+                  front_matter_count = 0;
+                  inserted = 0;
+              }
+              {
+                  print;
+                  if ($0 ~ /^---[ \t]*$/) {
+                      front_matter_count++;
+                      if (front_matter_count == 2 && inserted == 0) {
+                          print "";
+                          print "{{% pageinfo color=\"dark\" %}}";
+                          print "<span><span/>{{< message text=\"6\" >}}";
+                          print "{{% /pageinfo %}}";
+                          print "";
+                          inserted = 1;
+                      }
+                  }
+              }' "$index_file" > temp.md && mv temp.md "$index_file"
+
+              echo "✅ Modified $index_file with additional info block."
+          else
+              echo "⚠️ Warning: $index_file not found. Skipping modification."
+          fi
+
+          echo "✅ Version update script completed!"
+
+      # Step 5: Commit and push changes to the new branch
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m "Automated version update"
+          git push origin $BRANCH_NAME
+
+      # Step 6: Create a pull request back to main
+      - name: Create Pull Request
+        run: |
+          gh pr create --title "Automated Version Update" \
+                       --body "This PR updates the project version automatically." \
+                       --base main \
+                       --head $BRANCH_NAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  # Ensure you store this token in GitHub secrets
