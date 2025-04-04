@@ -82,7 +82,7 @@ jobs:
           done
 
           # Modify _index.md of base version (docs) to insert a page info block
-          index_file="content/docs/_index.md"
+          index_file="content/v1/_index.md"
           if [ -f "$index_file" ]; then
               echo "✅ Found $index_file, modifying..."
 
