@@ -19,6 +19,7 @@ jobs:
        id: hugo_version
        run: |
          latest_version=$(curl -s https://api.github.com/repos/gohugoio/hugo/releases/latest | jq -r .tag_name)
+         clean_version=${latest_version#v}  # Remove 'v' prefix if present
          echo "HUGO_VERSION=$latest_version" >> $GITHUB_ENV
 
      - name: Setup Hugo
