@@ -70,7 +70,7 @@ Supported driver and module versions offered by the Container Storage Module Ope
       Name      Path               
       -----------------------------
       System    /ifs               
-      ps01-az01 /ifs/data/ps01/az01
+      ps01-az01 /ifs/data/az01
       -----------------------------
       Total: 2 
       ```
@@ -92,9 +92,9 @@ Supported driver and module versions offered by the Container Storage Module Ope
 5. **Create the base directory for the storage class** 
     
    ```bash 
-   mkdir /ifs/data/ps01/az01/csi
-   chown csmadmin:csmadmins /ifs/data/ps01/az01/csi
-   chmod 755 /ifs/data/ps01/az01/csi
+   mkdir /ifs/data/az01/csi
+   chown csmadmin:csmadmins /ifs/data/az01/csi
+   chmod 755 /ifs/data/az01/csi
 
    ```
 <br> 
@@ -106,7 +106,7 @@ Supported driver and module versions offered by the Container Storage Module Ope
 7. **(optional) Create quota on the base directory** 
 
    ```bash 
-   isi quota quotas create /ifs/data/ps01/az01/csi directory --percent-advisory-threshold 80 --percent-soft-threshold 90 --soft-grace 1D --hard-threshold 100G --include-snapshots true
+   isi quota quotas create /ifs/data/az01/csi directory --percent-advisory-threshold 80 --percent-soft-threshold 90 --soft-grace 1D --hard-threshold 100G --include-snapshots true
    ``` 
 
 {{< /accordion >}}
@@ -258,7 +258,7 @@ dell-csm-operator-controller-manager-86dcdc8c48-6dkxm      2/2     Running      
 
 
     ```yaml
-    cat << EOF > csm-isilon.yaml
+    cat <<EOF> csm-isilon.yaml
     apiVersion: storage.dell.com/v1
     kind: ContainerStorageModule
     metadata:
@@ -266,15 +266,19 @@ dell-csm-operator-controller-manager-86dcdc8c48-6dkxm      2/2     Running      
       namespace: isilon
     spec:
       driver:
-        csiDriverType: "isilon"
-        configVersion: {{< version-docs key="PScale_latestVersion" >}}
+        csiDriverType: isilon
+        configVersion: v2.13.0
         authSecret: isilon-config
+        replicas: 1
+        csiDriverSpec:
+          fSGroupPolicy: File
+          storageCapacity: true
         common:
           envs:
-            - name: X_CSI_ISI_AUTH_TYPE
-              value: "1"
-     EOF 
-     ``` 
+          - name: X_CSI_ISI_AUTH_TYPE
+            value: "1"
+    EOF
+    ``` 
     </div> 
 
     **Detailed Configuration:** Use the [sample file](https://github.com/dell/csm-operator/blob/main/samples/storage_csm_powerscale_v2130.yaml) for detailed settings.
@@ -354,7 +358,7 @@ isilon      3h             isilon          {{< version-docs key="PScale_latestVe
        ClusterName: ps01
        AccessZone: ps01-az01  
        AzServiceIP: ps01-az01.example.com 
-       IsiPath: /ifs/data/ps01/az01/csi 
+       IsiPath: /ifs/data/az01/csi 
        RootClientEnabled: "false" 
        csi.storage.k8s.io/fstype: "nfs" 
     volumeBindingMode: Immediate
@@ -396,7 +400,7 @@ isilon      3h             isilon          {{< version-docs key="PScale_latestVe
     driver: csi-isilon.dellemc.com
     deletionPolicy: Delete
     parameters:
-       IsiPath: /ifs/data/ps01/az01/csi
+       IsiPath: /ifs/data/az01/csi
     EOF 
     ```
 
@@ -673,16 +677,21 @@ metadata:
   namespace: isilon
 spec:
   driver:
-    csiDriverType: "isilon"
+    csiDriverType: isilon
     configVersion: v2.13.0
     authSecret: isilon-config
+    replicas: 1
+    csiDriverSpec:
+      fSGroupPolicy: File
+      storageCapacity: true
     common:
-     envs:
+      envs:
       - name: X_CSI_ISI_AUTH_TYPE
         value: "1"
     sideCars:
     - name: provisioner
-      args: ["--volume-name-prefix=ocp08"]
+      args:
+      - --volume-name-prefix=ocp01
 EOF
 ```  
 
@@ -701,20 +710,25 @@ metadata:
   namespace: isilon
 spec:
   driver:
-    csiDriverType: "isilon"
+    csiDriverType: isilon
     configVersion: v2.13.0
     authSecret: isilon-config
+    replicas: 1
+    csiDriverSpec:
+      fSGroupPolicy: File
+      storageCapacity: true
     common:
       envs:
       - name: X_CSI_ISI_AUTH_TYPE
         value: "1"
+    sideCars:
+    - name: provisioner
+      args:
+      - --volume-name-prefix=ocp01
     node:
       envs:
       - name: X_CSI_ALLOWED_NETWORKS
         value: "[192.168.1.0/24]"
-    sideCars:
-    - name: provisioner
-      args: ["--volume-name-prefix=ocp08"]
 EOF
 ```  
 

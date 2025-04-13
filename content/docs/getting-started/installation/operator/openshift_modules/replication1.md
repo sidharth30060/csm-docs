@@ -11,11 +11,15 @@ description: >
 
    a. Use the below command to verify the SyncIQ is licensed on both PowerScale.  
 
+   <div></div>
+
    ```bash
     isi license list
    ``` 
 
    b. Use the below command to review the SyncIQ configuration on the source PowerScale 
+
+   <div></div>
 
       ```terminal
      ps01-1# isi sync settings view
@@ -46,7 +50,11 @@ description: >
                                   Password Set: No
       ``` 
    
+   <br>
+
    c. Use this command to review the SyncIQ configuration on the target PowerScale 
+
+   <div></div> 
 
     ```terminal
     ps02-1# isi sync settings view
@@ -139,7 +147,6 @@ description: >
    ```bash
    repctl cluster inject --use-sa 
    ``` 
-   <br>
 
 5. ##### **Install CSM Operator only on the source OpenShift Cluster** 
 
@@ -151,6 +158,7 @@ description: >
 
    c. Keep all default settings and click **Install**.
 
+   </br>
    
 
    Verify that the operator is deployed  
@@ -181,8 +189,6 @@ description: >
     oc new-project isilon
     ```
 
-    <br> 
-
 
 7. ##### **Create config secret on both source and target OpenShift Cluster** 
 
@@ -191,6 +197,8 @@ description: >
     Create a file called `config.yaml` or use [sample](https://github.com/dell/csi-powerscale/blob/main/samples/secret/secret.yaml): 
    
     Example: 
+    <div style="margin-bottom: -1.8rem">
+
 
     ```yaml
     cat <<EOF> config.yaml
@@ -209,7 +217,10 @@ description: >
       replicationCertificateID: "1e3def272e919debfb3cb5bfd1a8de2be09d4b0dfe9a0af1b3b26eab16477e80"
     EOF
     ```
+   </div>
 
+ 
+    <br>
 
     Edit the file, then run the command to create the `isilon-config`.
 
@@ -275,6 +286,7 @@ description: >
     ```
 
     Example:
+    <div style="margin-bottom: -1.8rem">
 
 
     ```yaml
@@ -311,6 +323,7 @@ description: >
             value: ocp02
     EOF 
     ``` 
+    </div>
    
    <br>
 
@@ -322,6 +335,7 @@ description: >
    NAME        CREATIONTIME   CSIDRIVERTYPE   CONFIGVERSION    STATE
    isilon      3h             isilon          {{< version-docs key="PScale_latestVersion" >}}          Succeeded      
    ```
+   <br> 
 
    Verify the CSM Pods are running in the Source OpenShift Cluster
    
@@ -333,6 +347,7 @@ description: >
    isilon-node-5xcxz                        2/2     Running   0             24h
    isilon-node-fpct7                        2/2     Running   0             24h 
    ``` 
+   <br>
 
    Verify the CSM Pods are running in the target OpenShift cluster.
    
@@ -345,6 +360,7 @@ description: >
    isilon-node-smv9s                        2/2     Running   0          2d4h
    ```
    
+   <br> 
 
    Verify the replication controller is running in both source and target OpenShift cluster.
 
@@ -363,6 +379,7 @@ description: >
 
     a. Create storage class in the source OpenShift Cluster.
        
+       <div></div>
 
        ```bash 
        oc apply -f sc-isilon-replication.yaml 
@@ -401,6 +418,7 @@ description: >
 
     b. Create Storage Class in the target OpenShift cluster.
 
+      <div></div>
 
       ```bash
       oc apply -f sc-isilon-replication.yaml
@@ -437,6 +455,7 @@ description: >
       EOF
       ``` 
       
+     <br> 
 
       Verify the Storage Class is created 
 
@@ -484,6 +503,7 @@ description: >
      pvc-isilon-replication   Bound    ocp01-f8eb93c213   8Gi        RWX            isilon-replication   <unset>                 2d2h 
      ```  
 
+     <br>
 
      Create deployment which uses Persistent Volume Claim with replicated storage class
      
@@ -544,6 +564,7 @@ description: >
 
      ```
      
+     <br>
      
      Verify the Replication Group is created
      ```terminal 
@@ -566,6 +587,7 @@ description: >
      [2025-03-19 19:33:27]  INFO
      ```
      
+     <br> 
 
      Verify the SyncIQ policies from the PowerScale cluster
 
@@ -578,6 +600,7 @@ description: >
      ----------------------------------------------------------------------------------------------------------------------------------------------------------
      Total: 1
      ``` 
+    <br> 
 
     Stop the application in the source site, if you are doing a planned failover.
     
@@ -592,6 +615,7 @@ description: >
     NAME          READY   UP-TO-DATE   AVAILABLE   AGE                                                                                                       
     deploy-demo   0/0     0            0           2d21h
     ```
+    <br> 
 
     Use the below commands to perform a failover from source cluster to target cluster. 
   
@@ -600,6 +624,7 @@ description: >
     [2025-03-20 16:29:46]  INFO RG (rg-80a563ca-5760-44db-b656-b0d23ee2b0b6), successfully updated with action: failover
     ```
 
+    <br> 
     Verify the status of the Replication Group after the failover 
 
     ```terminal 
@@ -620,6 +645,7 @@ description: >
     rg-80a563ca-5760-44db-b656-b0d23ee2b0b6 Ready   ocp01           csi-isilon.dellemc.com  rg-80a563ca-5760-44db-b656-b0d23ee2b0b6 false           FAILEDOVER
     [2025-03-20 16:31:49]  INFO
     ``` 
+    <br>
 
     Create PVC in the target cluster. 
 
@@ -636,6 +662,7 @@ description: >
     pvc-isilon-replication   Bound    ocp01-f8eb93c213   8Gi        RWX            isilon-replication       <unset>                 98s
     ```
     
+    <br>
     Start the application in the target OpenShift cluster
 
     ```bash
@@ -652,6 +679,7 @@ description: >
     
     ```
     
+    <br> 
 
     Reprotect the application.
 
@@ -682,6 +710,7 @@ description: >
     [2025-03-24 12:43:30]  INFO
     ````
     
+    <br>
 
     Verify the SyncIQ policy from the PowerScale Cluster. 
 
@@ -694,12 +723,3 @@ description: >
     ----------------------------------------------------------------------------------------------------------------------------------------------------------
     Total: 1 
     ```
-
-
-
-
-
-
-
-
-    

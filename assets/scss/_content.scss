@@ -95,12 +95,21 @@
     }  
     
     .highlight {
-        margin-top: 0.2rem;
-    }   
+        margin:0 !important ; 
+    } 
+    
+    pre{
+     margin: 2em 0 !important; 
+    }
 
-    p + div.highlight, p + div.code-toolbar{
+    p + div.highlight, p + div.code-toolbar, p + div.highlight pre{
         margin-top: -0.5rem !important;
-    }  
+    }
+    
+    div.highlight, div.code-toolbar, pre{
+     margin-top: -0.5rem !important;
+    }
+
 
     p + pre {
         margin-top: -0.5rem !important;
@@ -134,7 +143,11 @@
     }
 } 
 
-
+.td-max-width-on-larger-screens {
+ @include media-breakpoint-up(lg) {
+   max-width: 100%
+ }
+}
 
 .td-section{
     

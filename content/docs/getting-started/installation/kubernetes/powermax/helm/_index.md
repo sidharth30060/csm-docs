@@ -226,7 +226,7 @@ Starting with CSI PowerMax v1.7.0, `dell-csi-helm-installer` will not create any
 
 <br>
 
-{{< accordion id="Three" title="Modules">}}  
+{{< accordion id="Three" title="Modules">}}
 
 
 {{< cardcontainer >}}
