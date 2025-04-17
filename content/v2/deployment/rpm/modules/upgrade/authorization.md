@@ -15,10 +15,11 @@ description: >
 This section outlines the upgrade steps for Container Storage Modules (CSM) for Authorization.  The upgrade of CSM for Authorization RPM is handled in 2 parts:
 - Upgrading the CSM for Authorization proxy server
 - Upgrading the Dell CSI drivers with CSM for Authorization enabled
+The Authorization proxy server should be upgraded before upgrading the CSI Driver and Authorization sidecar.
 
 ## Upgrading CSM for Authorization proxy server
 
-Obtain the latest single binary installer RPM by following one of our two options [here](../../installation/authorization-v1.x/authorization-v1.x#shell-script-installer).
+Obtain the latest single binary installer RPM by following one of our two options [here](../../installation/authorization-v1.x/authorization-v1#shell-script-installer).
 
 To update the rpm package on the system, run the below command from within the extracted folder:
 
