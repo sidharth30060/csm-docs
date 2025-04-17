@@ -9,7 +9,7 @@ disable_footer: true
     <meta charset="utf-8">
     <title>CSM Installation Wizard | Dell Technologies</title>
     <link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="static/css/dds-icons.min.css" />
+    <link rel="stylesheet" href="static/css/dds-icons-min.css" />
     <link rel="stylesheet" href="static/css/dds-icons.css" />
     <link rel="stylesheet" type="text/css" href="static/css/style.css">
     <script type="text/javascript" src="static/js/jquery-3.6.1.min.js"></script>
@@ -82,10 +82,9 @@ disable_footer: true
                     <div class="col-sm-9"></div>
                     <div class="col-sm-3">
                       <select id="csm-version" class="form-select" onchange="onCSMVersionChange(); validateInput(validateForm, CONSTANTS)" required>
-                        <option value="1.9.3">CSM 1.9</option>
-                        <option value="1.10.2">CSM 1.10</option>                        
                         <option value="1.11.1">CSM 1.11</option>
-                        <option value="1.12.0" selected>CSM 1.12</option>
+                        <option value="1.12.0">CSM 1.12</option>
+                        <option value="1.13.0" selected>CSM 1.13</option>
                       </select>
                     </div>
                   </div>
