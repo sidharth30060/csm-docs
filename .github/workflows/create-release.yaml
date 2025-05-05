@@ -28,6 +28,22 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.tag }}
           release_name: ${{ github.event.inputs.title || github.event.inputs.tag }}
-          body: ${{ github.event.inputs.body }}
+          body: |
+            Documentation updates for [Container Storage Modules 1.13.0](https://github.com/dell/csm/releases/tag/v1.13.0)
+
+            - [CSM for Authorization](https://github.com/dell/karavi-authorization/releases/tag/v1.13.0)  
+            - [CSM for Replication](https://github.com/dell/csm-replication/releases/tag/v1.11.0)  
+            - [CSM for Observability](https://github.com/dell/karavi-observability/releases/tag/v1.11.0)  
+            - [CSM for Resiliency](https://github.com/dell/karavi-resiliency/releases/tag/v1.12.0)  
+            - [CSI Driver for Dell PowerFlex](https://github.com/dell/csi-powerflex/releases/tag/v2.13.0)  
+            - [CSI Driver for Dell PowerMax](https://github.com/dell/csi-powermax/releases/tag/v2.13.0)  
+            - [CSI Driver for Dell PowerScale](https://github.com/dell/csi-powerscale/releases/tag/v2.13.0)  
+            - [CSI Driver for Dell PowerStore](https://github.com/dell/csi-powerstore/releases/tag/v2.13.0)  
+            - [CSI Driver for Dell Unity](https://github.com/dell/csi-unity/releases/tag/v2.13.0)  
+            - [CSM Installation Wizard](https://dell.github.io/csm-docs/docs/deployment/csminstallationwizard/src/)  
+            - [Tool to validate Dell CSI Drivers](https://github.com/dell/cert-csi/releases/tag/v1.7.0)  
+            - [CSM Operator](https://github.com/dell/csm-operator/releases/tag/v1.8.0)
+
           draft: false
+          draft: TRUE
           prerelease: false
