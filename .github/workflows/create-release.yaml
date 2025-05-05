@@ -44,6 +44,5 @@ jobs:
             - [Tool to validate Dell CSI Drivers](https://github.com/dell/cert-csi/releases/tag/v1.7.0)  
             - [CSM Operator](https://github.com/dell/csm-operator/releases/tag/v1.8.0)
 
-          draft: false
-          draft: TRUE
+          draft: true
           prerelease: false
