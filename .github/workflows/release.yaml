@@ -19,6 +19,20 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PAT_TOKEN }}
+      
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_tag_gpgsign: true
+          git_config_global: true
+
+      - name: Set Git Identity
+        run: |
+          git config --global user.name "Sidharth Sharma"
+          git config --global user.email "Sidharth.Sharma1@dell.com"
 
       - name: Get New Release Version from deploy.yml
         id: get-new-version
@@ -68,8 +82,6 @@ jobs:
           echo "After update:"
           cat .github/workflows/deploy.yml
 
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "GitHub Actions"
           git add .github/workflows/deploy.yml
           git commit -m "Update deploy.yml to track $NEW_RELEASE"
           git push origin "$NEW_RELEASE"
