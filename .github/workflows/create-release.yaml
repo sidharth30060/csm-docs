@@ -74,12 +74,11 @@ jobs:
           "
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ github.event.inputs.tag }}
-          release_name: ${{ github.event.inputs.title || github.event.inputs.tag }}
-          body_path: release_body.md
+          tag: ${{ github.event.inputs.tag }}
+          name: ${{ github.event.inputs.title || github.event.inputs.tag }}
+          bodyFile: release_body.md
           draft: true
-          prerelease: false
+          prerelease: false 
+          token: ${{ secrets.PAT_TOKEN }}
