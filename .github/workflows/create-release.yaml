@@ -9,40 +9,77 @@ on:
       title:
         description: 'Release title'
         required: false
-      body:
-        description: 'Release description / changelog'
-        required: false
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
+      - name: Checkout current repo
         uses: actions/checkout@v4
 
+      - name: Checkout dell/csm
+        uses: actions/checkout@v4
+        with:
+          repository: dell/csm
+          path: csm
+          ref: main
+
+      - name: Set up Python and install PyYAML
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          pip3 install pyyaml
+
+      - name: Parse YAML and generate release notes
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.tag }}
+        run: |
+          python3 -c "
+import yaml
+import os
+
+with open('csm/config/csm-versions.yaml') as f:
+    versions = yaml.safe_load(f)
+
+data = {
+    'karavi_authorization': versions.get('karavi-authorization', 'vX.X.X'),
+    'csm_replication': versions.get('csm-replication', 'vX.X.X'),
+    'karavi_observability': versions.get('karavi-observability', 'vX.X.X'),
+    'karavi_resiliency': versions.get('karavi-resiliency', 'vX.X.X'),
+    'csi_powerflex': versions.get('csi-vxflexos', 'vX.X.X'),
+    'csi_powermax': versions.get('csi-powermax', 'vX.X.X'),
+    'csi_powerscale': versions.get('csi-powerscale', 'vX.X.X'),
+    'csi_powerstore': versions.get('csi-powerstore', 'vX.X.X'),
+    'csi_unity': versions.get('csi-unity', 'vX.X.X'),
+    'cert_csi': versions.get('cert-csi', 'vX.X.X'),
+    'csm_operator': versions.get('csm-operator', 'vX.X.X'),
+}
+
+with open('release_body.md', 'w') as f:
+    f.write(f\"\"\"Documentation updates for [Container Storage Modules {os.environ['RELEASE_TAG']}](https://github.com/dell/csm/releases/tag/{os.environ['RELEASE_TAG']})
+
+- [CSM for Authorization](https://github.com/dell/karavi-authorization/releases/tag/{data['karavi_authorization']})
+- [CSM for Replication](https://github.com/dell/csm-replication/releases/tag/{data['csm_replication']})
+- [CSM for Observability](https://github.com/dell/karavi-observability/releases/tag/{data['karavi_observability']})
+- [CSM for Resiliency](https://github.com/dell/karavi-resiliency/releases/tag/{data['karavi_resiliency']})
+- [CSI Driver for Dell PowerFlex](https://github.com/dell/csi-powerflex/releases/tag/{data['csi_powerflex']})
+- [CSI Driver for Dell PowerMax](https://github.com/dell/csi-powermax/releases/tag/{data['csi_powermax']})
+- [CSI Driver for Dell PowerScale](https://github.com/dell/csi-powerscale/releases/tag/{data['csi_powerscale']})
+- [CSI Driver for Dell PowerStore](https://github.com/dell/csi-powerstore/releases/tag/{data['csi_powerstore']})
+- [CSI Driver for Dell Unity](https://github.com/dell/csi-unity/releases/tag/{data['csi_unity']})
+- [CSM Installation Wizard](https://dell.github.io/csm-docs/docs/deployment/csminstallationwizard/src/)
+- [Tool to validate Dell CSI Drivers](https://github.com/dell/cert-csi/releases/tag/{data['cert_csi']})
+- [CSM Operator](https://github.com/dell/csm-operator/releases/tag/{data['csm_operator']})
+\"\"\")
+          "
+
       - name: Create GitHub Release
-        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           tag_name: ${{ github.event.inputs.tag }}
           release_name: ${{ github.event.inputs.title || github.event.inputs.tag }}
-          body: |
-            Documentation updates for [Container Storage Modules 1.13.0](https://github.com/dell/csm/releases/tag/v1.13.0)
-
-            - [CSM for Authorization](https://github.com/dell/karavi-authorization/releases/tag/v1.13.0)  
-            - [CSM for Replication](https://github.com/dell/csm-replication/releases/tag/v1.11.0)  
-            - [CSM for Observability](https://github.com/dell/karavi-observability/releases/tag/v1.11.0)  
-            - [CSM for Resiliency](https://github.com/dell/karavi-resiliency/releases/tag/v1.12.0)  
-            - [CSI Driver for Dell PowerFlex](https://github.com/dell/csi-powerflex/releases/tag/v2.13.0)  
-            - [CSI Driver for Dell PowerMax](https://github.com/dell/csi-powermax/releases/tag/v2.13.0)  
-            - [CSI Driver for Dell PowerScale](https://github.com/dell/csi-powerscale/releases/tag/v2.13.0)  
-            - [CSI Driver for Dell PowerStore](https://github.com/dell/csi-powerstore/releases/tag/v2.13.0)  
-            - [CSI Driver for Dell Unity](https://github.com/dell/csi-unity/releases/tag/v2.13.0)  
-            - [CSM Installation Wizard](https://dell.github.io/csm-docs/docs/deployment/csminstallationwizard/src/)  
-            - [Tool to validate Dell CSI Drivers](https://github.com/dell/cert-csi/releases/tag/v1.7.0)  
-            - [CSM Operator](https://github.com/dell/csm-operator/releases/tag/v1.8.0)
-
+          body_path: release_body.md
           draft: true
           prerelease: false
