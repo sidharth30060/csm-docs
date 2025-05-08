@@ -52,7 +52,7 @@ jobs:
 
           with open(os.environ['GITHUB_ENV'], 'a') as env:
               env.write(f'RELEASE_TAG={csm_version}\n')
-              env.write(f'RELEASE_TITLE=Container Storage Modules v{csm_version_stripped}\n')
+              env.write(f'RELEASE_TITLE=Container Storage Modules {csm_version_stripped}\n')
 
 
           with open('release_body.md', 'w') as f:
