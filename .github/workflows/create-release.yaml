@@ -1,14 +1,7 @@
 name: Create GitHub Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Release tag (e.g., v1.14.0)'
-        required: true
-      title:
-        description: 'Release title'
-        required: false
+  workflow_dispatch:  # still manual, but no inputs required
 
 jobs:
   release:
@@ -30,9 +23,8 @@ jobs:
           sudo apt-get install -y python3-pip
           pip3 install pyyaml
 
-      - name: Parse YAML and generate release notes
-        env:
-          RELEASE_TAG: ${{ github.event.inputs.tag }}
+      - name: Parse csm-version and generate release notes
+        id: prepare
         run: |
           python3 -c "
           import yaml
@@ -40,6 +32,8 @@ jobs:
 
           with open('csm/config/csm-versions.yaml') as f:
               versions = yaml.safe_load(f)
+
+          csm_version = versions.get('csm-version', 'vX.X.X')
 
           data = {
               'karavi_authorization': versions.get('karavi-authorization', 'vX.X.X'),
@@ -55,8 +49,11 @@ jobs:
               'csm_operator': versions.get('csm-operator', 'vX.X.X'),
           }
 
+          with open(os.environ['GITHUB_ENV'], 'a') as env:
+              env.write(f'RELEASE_TAG={csm_version}\n')
+
           with open('release_body.md', 'w') as f:
-              f.write(f\"\"\"Documentation updates for [Container Storage Modules {os.environ['RELEASE_TAG']}](https://github.com/dell/csm/releases/tag/{os.environ['RELEASE_TAG']})
+              f.write(f\"\"\"Documentation updates for [Container Storage Modules {csm_version}](https://github.com/dell/csm/releases/tag/{csm_version})
 
           - [CSM for Authorization](https://github.com/dell/karavi-authorization/releases/tag/{data['karavi_authorization']})
           - [CSM for Replication](https://github.com/dell/csm-replication/releases/tag/{data['csm_replication']})
@@ -76,9 +73,9 @@ jobs:
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ github.event.inputs.tag }}
-          name: ${{ github.event.inputs.title || github.event.inputs.tag }}
+          tag: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_TAG }}
           bodyFile: release_body.md
           draft: true
-          prerelease: false 
+          prerelease: false
           token: ${{ secrets.PAT_TOKEN }}
