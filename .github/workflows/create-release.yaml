@@ -56,7 +56,7 @@ jobs:
 
 
           with open('release_body.md', 'w') as f:
-              f.write(f\"\"\"Documentation updates for [Container Storage Modules {csm_version}](https://github.com/dell/csm/releases/tag/{csm_version})
+              f.write(f\"\"\"Documentation updates for idk [Container Storage Modules {csm_version}](https://github.com/dell/csm/releases/tag/{csm_version})
 
           - [CSM for Authorization](https://github.com/dell/karavi-authorization/releases/tag/{data['karavi_authorization']})
           - [CSM for Replication](https://github.com/dell/csm-replication/releases/tag/{data['csm_replication']})
