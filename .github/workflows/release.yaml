@@ -127,7 +127,7 @@ jobs:
               env.write(f'RELEASE_TITLE=Container Storage Modules {csm_version_stripped}\n')
 
           with open('release_body.md', 'w') as f:
-              f.write(f\"\"\"Documentation updates for [Container Storage Modules {csm_version}](https://github.com/dell/csm/releases/tag/{csm_version})
+              f.write(f\"\"\"Documentation updates for [Container Storage Modules {csm_version_stripped}](https://github.com/dell/csm/releases/tag/{csm_version})
 
           [CSM for Authorization](https://github.com/dell/karavi-authorization/releases/tag/{data['karavi_authorization']})
           [CSM for Replication](https://github.com/dell/csm-replication/releases/tag/{data['csm_replication']})
@@ -138,7 +138,7 @@ jobs:
           [CSI Driver for Dell PowerScale](https://github.com/dell/csi-powerscale/releases/tag/{data['csi_powerscale']})
           [CSI Driver for Dell PowerStore](https://github.com/dell/csi-powerstore/releases/tag/{data['csi_powerstore']})
           [CSI Driver for Dell Unity](https://github.com/dell/csi-unity/releases/tag/{data['csi_unity']})
-          [CSM Installation Wizard](https://dell.github.io/csm-docs/docs/deployment/csminstallationwizard/src/)
+          [CSM Installation Wizard](https://dell.github.io/csm-docs/docs/getting-started/installation/installationwizard/src/)
           [Tool to validate Dell CSI Drivers](https://github.com/dell/cert-csi/releases/tag/{data['cert_csi']})
           [CSM Operator](https://github.com/dell/csm-operator/releases/tag/{data['csm_operator']})
           \"\"\")
@@ -152,4 +152,4 @@ jobs:
           bodyFile: release_body.md
           draft: true
           prerelease: false
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN}}
