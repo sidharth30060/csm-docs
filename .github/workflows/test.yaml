@@ -27,6 +27,7 @@ jobs:
         with:
           token: ${{ steps.generate-token.outputs.token }}
           branch: "test-signed-commit-pr"
+          base: "github-actions-test"
           commit-message: "test: Signed commit via GitHub App"
           title: "Test PR with Signed Commit"
           body: |
