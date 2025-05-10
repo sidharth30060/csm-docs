@@ -1,36 +1,15 @@
-name: Test Signed Commit
+# .github/workflows/dummy-action.yaml
+name: Dummy Action
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Enables manual trigger from GitHub UI
 
 jobs:
-  test-signed-pr:
+  say-hello:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Generate random change
-        run: |
-          echo "Test run at $(date)" >> .test-commit.txt
-
-      - name: Generate GitHub App token
-        uses: actions/create-github-app-token@v2
-        id: generate-token
-        with:
-          app-id: ${{ vars.CSM_RELEASE_APP_ID }}
-          private-key: ${{ secrets.CSM_RELEASE_APP_PRIVATE_KEY }}
-
-      - name: Create pull request with signed commit
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ steps.generate-token.outputs.token }}
-          branch: "test-signed-commit-pr"
-          base: "github-actions-test"
-          commit-message: "test: Signed commit via GitHub App"
-          title: "Test PR with Signed Commit"
-          body: |
-            This pull request was automatically generated to test signed commits using a GitHub App.
-          sign-commits: true
-          delete-branch: true
+      - name: Say Hello
+        run: echo "Hello, World! Manually triggered!"
