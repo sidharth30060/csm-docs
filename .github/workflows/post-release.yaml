@@ -246,7 +246,6 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}  # Use your PAT token for better permissions
           branch: ${{ env.BRANCH_NAME }}
           base: main
-          commit-message: "Setup Main branch for ${{ env.NEXT_TARGET_VERSION }}"
           title: "Setup Main branch for ${{ env.NEXT_TARGET_VERSION }}"
           body: |
             <h1 style='margin-top: 0; margin-bottom: 0;'>Description</h1>
