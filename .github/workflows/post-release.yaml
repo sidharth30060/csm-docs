@@ -228,17 +228,17 @@ jobs:
           echo "After update:"
           cat .github/workflows/deploy.yml
           
-      - name: Generate GitHub App token
-        id: generate-token
-        uses: actions/create-github-app-token@v2.0.5
-        with:
-           app-id: ${{ vars.CSM_RELEASE_APP_ID }}
-           private-key: ${{ secrets.CSM_RELEASE_APP_PRIVATE_KEY }}
+      # - name: Generate GitHub App token
+      #  id: generate-token
+      #  uses: actions/create-github-app-token@v2.0.5
+      #  with:
+      #     app-id: ${{ vars.CSM_RELEASE_APP_ID }}
+      #     private-key: ${{ secrets.CSM_RELEASE_APP_PRIVATE_KEY }}
               
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ steps.generate-token.outputs.token }}
+          # token: ${{ steps.generate-token.outputs.token }}
           branch: ${{ env.BRANCH_NAME }}
           base: main
           commit-message: "Setup Main branch for ${{ env.NEXT_TARGET_VERSION }}"
