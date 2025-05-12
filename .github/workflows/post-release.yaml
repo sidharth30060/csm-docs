@@ -247,4 +247,4 @@ jobs:
                          --base main \
                          --head $BRANCH_NAME
         env:
-            GITHUB_TOKEN: ${{ secrets.CSMBOT_PAT }}  # Ensure you store this token in GitHub secrets
+            GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  # Ensure you store this token in GitHub secrets
