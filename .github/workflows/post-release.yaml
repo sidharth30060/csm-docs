@@ -237,7 +237,7 @@ jobs:
       - name: Commit and push changes
         run: |
           git add .
-          git commit -m -S "Setup Main branch for $NEXT_TARGET_VERSION"
+          git commit -S -m  "Setup Main branch for $NEXT_TARGET_VERSION"
           git push origin $BRANCH_NAME
         
       - name: Create Pull Request
