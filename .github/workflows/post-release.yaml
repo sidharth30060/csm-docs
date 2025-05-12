@@ -257,4 +257,5 @@ jobs:
               <li>[ ] Have you tested whether the hyperlinks are working properly?</li>
               <li>[ ] Did you add the examples wherever applicable?</li>
               <li>[ ] Have you added high-resolution images?</li>
-            </ul>
+            </ul> 
+          sign-commits: true
