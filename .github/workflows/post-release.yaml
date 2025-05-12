@@ -30,12 +30,6 @@ jobs:
             git_tag_gpgsign: true
             git_config_global: true
 
-      # Step 2: Configure Git user identity for commits
-      - name: Set up Git user
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
       # Step 3: Create a new branch for changes
       - name: Create new branch
         run: |
