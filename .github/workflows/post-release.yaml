@@ -19,18 +19,29 @@ jobs:
           ref: main
           fetch-depth: 0  # Required to create a new branch from the full commit history
           token: ${{ secrets.PAT_TOKEN }}
+          
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+            gpg_private_key: ${{ secrets.CSM_GPG_PRIVATE_KEY }}
+            passphrase: ${{ secrets.PASSPHRASE }}
+            git_user_signingkey: true
+            git_commit_gpgsign: true
+            git_tag_gpgsign: true
+            git_config_global: true
 
+      # Step 2: Configure Git user identity for commits
+      - name: Set up Git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       # Step 3: Create a new branch for changes
       - name: Create new branch
         run: |
           BRANCH_NAME="setup_main_branch"
           git checkout -b $BRANCH_NAME
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV 
-      
-      - name: Push new branch to origin
-        run: |
-          git push origin $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
       - name: Determine version for main branch setup
         run: |
@@ -217,7 +228,7 @@ jobs:
 
           echo "🎉 Version update completed successfully!"
 
-      # Step 5: Update deploy.yml to track latest release branch
+      # Step 6: Update deploy.yml to track latest release branch
       - name: Update deploy.yml to track latest release branch
         run: |
           echo "Before update:"
@@ -227,29 +238,37 @@ jobs:
 
           echo "After update:"
           cat .github/workflows/deploy.yml
-          
-      # - name: Generate GitHub App token
-      #  id: generate-token
-      #  uses: actions/create-github-app-token@v2.0.5
-      #  with:
-      #     app-id: ${{ vars.CSM_RELEASE_APP_ID }}
-      #     private-key: ${{ secrets.CSM_RELEASE_APP_PRIVATE_KEY }}
-              
+      
+      # Step 7: Commit and push changes to the new branch
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m -S "Setup Main branch for $NEXT_TARGET_VERSION"
+          git push origin $BRANCH_NAME
+        
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
-          # token: ${{ steps.generate-token.outputs.token }}
+          token: ${{ secrets.PAT_TOKEN }}  # Use your PAT token for better permissions
           branch: ${{ env.BRANCH_NAME }}
           base: main
           commit-message: "Setup Main branch for ${{ env.NEXT_TARGET_VERSION }}"
           title: "Setup Main branch for ${{ env.NEXT_TARGET_VERSION }}"
           body: |
             <h1 style='margin-top: 0; margin-bottom: 0;'>Description</h1>
-            <ul><li>Set up main branch for ${{ env.NEXT_TARGET_VERSION }}
-            <ul><li>Move "content/docs" to v1, move the v1 content to v2, and finally move the v2 content to v3.</li></ul></li></ul>
+            <ul>
+              <li>Set up main branch for ${{ env.NEXT_TARGET_VERSION }}
+                <ul>
+                  <li>Move "content/docs" to v1, move the v1 content to v2, and finally move the v2 content to v3.</li>
+                </ul>
+              </li>
+            </ul>
             <h2 style='margin-top: 0; margin-bottom: 0;'>GitHub Issues</h2>
             <p>List the GitHub issues impacted by this PR:</p>
-            <table><tr><th>GitHub Issue #</th></tr><tr><td><a href=''></a></td></tr></table>
+            <table>
+              <tr><th>GitHub Issue #</th></tr>
+              <tr><td><a href=''></a></td></tr>
+            </table>
             <h2 style='margin-top: 0; margin-bottom: 0;'>Checklist</h2>
             <ul>
               <li>[ ] Have you run a grammar and spell checks against your submission?</li>
@@ -257,5 +276,4 @@ jobs:
               <li>[ ] Have you tested whether the hyperlinks are working properly?</li>
               <li>[ ] Did you add the examples wherever applicable?</li>
               <li>[ ] Have you added high-resolution images?</li>
-            </ul> 
-          sign-commits: true
+            </ul>
